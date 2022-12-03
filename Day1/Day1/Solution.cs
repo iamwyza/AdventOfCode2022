@@ -4,6 +4,7 @@ internal static class Solution
 {
     public static async Task RunPart1()
     {
+        Console.WriteLine("Day 1 - Part 1:");
         var lines = await File.ReadAllLinesAsync("day1input.txt");
 
         // part1
@@ -34,6 +35,7 @@ internal static class Solution
 
     public static async Task RunPart2()
     {
+        Console.WriteLine("Day 1 - Part 2:");
         var lines = await File.ReadAllLinesAsync("day1input.txt");
         Dictionary<int, int> totals = new() { { 0, 0 } };
         int elfIndex = 0;

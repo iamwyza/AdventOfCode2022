@@ -10,6 +10,7 @@ internal static class Solution
 
     public static async Task RunPart1()
     {
+        Console.WriteLine("Day 2 - Part 1:");
         var lines = await File.ReadAllLinesAsync("Day2\\day2input.txt");
 
         int score = 0;
@@ -60,6 +61,7 @@ internal static class Solution
 
     public static async Task RunPart2()
     {
+        Console.WriteLine("Day 2 - Part 2:");
         var lines = await File.ReadAllLinesAsync("Day2\\day2input.txt");
 
         int score = 0;
