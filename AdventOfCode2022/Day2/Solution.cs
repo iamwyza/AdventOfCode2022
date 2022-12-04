@@ -1,5 +1,5 @@
 ﻿namespace AdventOfCode2022.Day2;
-internal static class Solution
+internal class Solution : DayBase
 {
     private enum Hand
     {
@@ -8,26 +8,27 @@ internal static class Solution
         Scissors
     }
 
-    public static async Task RunPart1()
+    public override async Task RunPart1()
     {
-        Console.WriteLine("Day 2 - Part 1:");
-        var lines = await File.ReadAllLinesAsync("Day2\\day2input.txt");
+        PrintStart(1);
 
         int score = 0;
-        
-        foreach (var line in lines)
+
+        foreach (var line in await GetLines())
         {
             Hand opponent = line[0] switch
             {
                 'A' => Hand.Rock,
                 'B' => Hand.Paper,
-                'C' => Hand.Scissors
+                'C' => Hand.Scissors,
+                _ => throw new ArgumentOutOfRangeException()
             };
             Hand me = line[2] switch
             {
                 'X' => Hand.Rock,
                 'Y' => Hand.Paper,
-                'Z' => Hand.Scissors
+                'Z' => Hand.Scissors,
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             switch (me)
@@ -59,21 +60,22 @@ internal static class Solution
 
     }
 
-    public static async Task RunPart2()
+    public override async Task RunPart2()
     {
-        Console.WriteLine("Day 2 - Part 2:");
-        var lines = await File.ReadAllLinesAsync("Day2\\day2input.txt");
+        PrintStart(2);
 
         int score = 0;
 
-        foreach (var line in lines)
+        foreach (var line in await GetLines())
         {
             Hand opponent = line[0] switch
             {
                 'A' => Hand.Rock,
                 'B' => Hand.Paper,
-                'C' => Hand.Scissors
+                'C' => Hand.Scissors,
+                _ => throw new ArgumentOutOfRangeException()
             };
+
             Hand me = line[2] switch
             {
                 //Lose
@@ -85,7 +87,8 @@ internal static class Solution
                 //Win
                 'Z' when opponent == Hand.Rock => Hand.Paper,
                 'Z' when opponent == Hand.Scissors => Hand.Rock,
-                'Z' => Hand.Scissors
+                'Z' => Hand.Scissors,
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             switch (me)

@@ -1,17 +1,15 @@
 ﻿namespace AdventOfCode2022.Day1;
 
-internal static class Solution
+internal class Solution : DayBase
 {
-    public static async Task RunPart1()
+    public override async Task RunPart1()
     {
-        Console.WriteLine("Day 1 - Part 1:");
-        var lines = await File.ReadAllLinesAsync("day1input.txt");
-
-        // part1
+        PrintStart(1);
+        
         int runningTotal = 0;
         int max = 0;
 
-        foreach (var line in lines)
+        foreach (var line in await GetLines())
         {
             if (string.IsNullOrEmpty(line))
             {
@@ -33,13 +31,12 @@ internal static class Solution
 
     }
 
-    public static async Task RunPart2()
+    public override async Task RunPart2()
     {
-        Console.WriteLine("Day 1 - Part 2:");
-        var lines = await File.ReadAllLinesAsync("day1input.txt");
+        PrintStart(2);
         Dictionary<int, int> totals = new() { { 0, 0 } };
         int elfIndex = 0;
-        foreach (var line in lines)
+        foreach (var line in await GetLines())
         {
             if (string.IsNullOrEmpty(line))
             {
