@@ -26,11 +26,11 @@ while ((dayAndPartToRun = Console.ReadLine()) != "0")
 
     if (input[1] == 1)
     {
-        await DayBase.Days[input[1]].RunPart1();
+        await DayBase.Days[input[0]].RunPart1();
     }
     else
     {
-        await DayBase.Days[input[1]].RunPart2();
+        await DayBase.Days[input[0]].RunPart2();
     }
     PrintDays();
 }
