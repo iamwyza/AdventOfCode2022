@@ -1,13 +1,10 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace AdventOfCode2022.Day7;
 internal class Solution : DayBase
 {
-    private Dir _root = new Dir { Name = "/" };
+    private readonly Dir _root = new() { Name = "/" };
 
     private void PopulateFileSystem(string[] lines)
     {
