@@ -9,8 +9,17 @@ PrintDays();
 
 string? dayAndPartToRun = "";
 
-while ((dayAndPartToRun = Console.ReadLine()) != "0")
+string? last = null;
+
+while (true)
 {
+    dayAndPartToRun = Console.ReadLine();
+    if (string.IsNullOrEmpty(dayAndPartToRun) && last != null)
+        dayAndPartToRun = last;
+
+    if (dayAndPartToRun == "0")
+        break;
+
     if (!validationRegex.IsMatch(dayAndPartToRun ?? ""))
     {
         Console.WriteLine("Invalid input.  Format: Day-Part.  Example: 1-1");
@@ -32,6 +41,8 @@ while ((dayAndPartToRun = Console.ReadLine()) != "0")
     {
         await DayBase.Days[input[0]].RunPart2();
     }
+
+    last = dayAndPartToRun;
     PrintDays();
 }
 
