@@ -1,4 +1,7 @@
-﻿namespace AdventOfCode2022.Day8;
+﻿using System.Reflection.Metadata;
+using Spectre.Console;
+
+namespace AdventOfCode2022.Day8;
 internal class Solution : DayBase
 {
     private int[,] _trees;
@@ -23,9 +26,9 @@ internal class Solution : DayBase
             for (int x = 0; x < _cols; x++)
             {
                 _trees[y, x] = int.Parse(lines[y][x].ToString());
-                Console.Write(_trees[y, x]);
+                //Console.Write(_trees[y, x]);
             }
-            Console.WriteLine();
+            //Console.WriteLine();
         }
     }
 
@@ -117,12 +120,14 @@ internal class Solution : DayBase
         await Init();
 
         int highestScore = 0;
+        (int X, int Y) bestCoords = (0, 0);
+        bool[,] bestVisibleTrees = new bool[0,0];
 
         for (int y = 0; y < _rows; y++)
         {
             for (int x = 0; x < _cols; x++)
             {
-                Console.WriteLine($"{x}, {y} ({_trees[y,x]})");
+               // Console.WriteLine($"{x}, {y} ({_trees[y,x]})");
                 _scores[y, x] = Walk(x, y, Direction.Left) 
                                 * Walk(x, y, Direction.Right)
                                 * Walk(x, y, Direction.Up)
@@ -131,11 +136,18 @@ internal class Solution : DayBase
                 if (_scores[y, x] > highestScore)
                 {
                     highestScore = _scores[y, x];
+                    bestCoords.X = x; 
+                    bestCoords.Y = y;
+                    bestVisibleTrees = _visibleTrees;
                 }
+                _visibleTrees = new bool[_rows, _cols];
             }
         }
 
+        _visibleTrees = bestVisibleTrees;
         Console.WriteLine($"Best Scoring Tree {highestScore}");
+
+        PrintTreesCanvas(bestCoords.X, bestCoords.Y);
     }
 
     private int Walk(int xStart, int yStart, Direction direction)
@@ -185,7 +197,7 @@ internal class Solution : DayBase
             }
         }
 
-        Console.WriteLine($"{direction} = {distance}");
+        //Console.WriteLine($"{direction} = {distance}");
 
         return distance;
     }
@@ -244,5 +256,30 @@ internal class Solution : DayBase
     }
 
 
+    private void PrintTreesCanvas(int startX, int startY)
+    {
+        var canvas = new Canvas(_cols, _rows);
+        for (int y = 0; y<_trees.GetLength(0); y++)
+        {
+            for (int x = 0; x< _trees.GetLength(1); x++)
+            {
+                if (_visibleTrees[y, x])
+                {
+                    var heightColor = (byte)(200 - _trees[y, x] * 15);
 
+                    canvas.SetPixel(x, y, new Color(0, 0, heightColor));
+                }
+                else
+                {
+                    var heightColor = (byte)(200 - _trees[y, x] * 15);
+                    canvas.SetPixel(x, y, new Color(0, heightColor, 0));
+                }
+            }
+        }
+
+        //canvas.PixelWidth = 1;
+        canvas.SetPixel(startX, startY, Color.Red);
+
+        AnsiConsole.Write(canvas);
+    }
 }

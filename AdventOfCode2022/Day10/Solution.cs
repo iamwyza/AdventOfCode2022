@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using Spectre.Console;
 
 namespace AdventOfCode2022.Day10
 ;
@@ -63,10 +64,6 @@ internal class Solution : DayBase
         }
         clock++;
     }
-
-
-
-
 
     public override async Task RunPart2()
     {
@@ -136,15 +133,15 @@ internal class Solution : DayBase
         int pixel = (clock - 1) % 40 ;
         if (pixel - 1 <= signal && pixel + 1 >= signal)
         {
-            row += '#';
+            row += "[blue]#[/]";
         }
         else
         {
-            row += '.';
+            row += "[grey27].[/]";
         }
         if (clock % 40  == 0)
         {
-            Console.WriteLine(row);
+            AnsiConsole.MarkupLine(row);
             row = string.Empty;
         }
         clock++;

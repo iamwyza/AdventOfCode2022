@@ -1,39 +1,40 @@
-﻿using System.Text.RegularExpressions;
+﻿using Spectre.Console;
 
 DayBase.ScanForSolutions();
 
-Regex validationRegex = new Regex(@"^\d+-\d+", RegexOptions.Compiled);
-
-Console.WriteLine("Enter Day and Part to run.  Example: Day 1 - Part 1 would be 1-1.  Day 3 - Part 2 would be 3-2.  Enter 0 for exit;");
-PrintDays();
-
-string? dayAndPartToRun = "";
+var choice = "";
 
 string? last = null;
 
-while (true)
-{
-    dayAndPartToRun = Console.ReadLine();
-    if (string.IsNullOrEmpty(dayAndPartToRun) && last != null)
-        dayAndPartToRun = last;
 
-    if (dayAndPartToRun == "0")
+while (choice != "0")
+{
+    var prompt = new SelectionPrompt<string>()
+        .Title(
+            "Enter Day and Part to run.  Example: Day 1 - Part 1 would be 1-1.  Day 3 - Part 2 would be 3-2.  Enter 0 for exit;?")
+        .PageSize(100)
+        .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]");
+    if (!string.IsNullOrEmpty(last))
+    {
+        prompt.AddChoice(last);
+    }
+    prompt.AddChoices("0")
+    .AddChoices(DayBase.Days.Keys.OrderByDescending(x => x)
+        .SelectMany(x => new string[] { x + "-" + 1, x + "-" + 2 }).ToArray());
+
+
+    choice = AnsiConsole.Prompt(
+        prompt
+    );
+
+    if (choice == "0")
         break;
 
-    if (!validationRegex.IsMatch(dayAndPartToRun ?? ""))
-    {
-        Console.WriteLine("Invalid input.  Format: Day-Part.  Example: 1-1");
-        continue;
-    }
+    AnsiConsole.Clear();
 
-    var input = dayAndPartToRun?.Split('-', 2).Select(int.Parse).ToArray();
-    if (input == null)
-    {
-        Console.WriteLine("Invalid input.  Format: Day-Part.  Example: 1-1");
-        return;
-    }
+    var input = choice?.Split('-', 2).Select(int.Parse).ToArray();
 
-    if (input[1] == 1)
+    if (input![1] == 1)
     {
         await DayBase.Days[input[0]].RunPart1();
     }
@@ -42,18 +43,7 @@ while (true)
         await DayBase.Days[input[0]].RunPart2();
     }
 
-    last = dayAndPartToRun;
-    PrintDays();
-}
+    Console.WriteLine();
 
-void PrintDays()
-{
-    Console.WriteLine("\n\nAvailable Days:");
-
-    foreach (int day in DayBase.Days.Keys.OrderBy(x => x))
-    {
-        Console.WriteLine($"\t{day}-1");
-        Console.WriteLine($"\t{day}-2");
-    }
-    Console.WriteLine("\n 0 to Exit;");
+    last = choice;
 }
