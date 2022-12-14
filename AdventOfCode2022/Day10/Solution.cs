@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualBasic;
-using Spectre.Console;
 
 namespace AdventOfCode2022.Day10
 ;

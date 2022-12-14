@@ -1,5 +1,4 @@
 ﻿using System.Reflection.Metadata;
-using Spectre.Console;
 
 namespace AdventOfCode2022.Day8;
 internal class Solution : DayBase

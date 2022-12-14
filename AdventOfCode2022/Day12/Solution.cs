@@ -1,7 +1,4 @@
-﻿using Spectre.Console;
-
-namespace AdventOfCode2022.Day12
-;
+﻿namespace AdventOfCode2022.Day12;
 internal class Solution : DayBase
 {
     private int[,] _map;
@@ -54,7 +51,7 @@ internal class Solution : DayBase
         MakeGraph();
 
         var test = Move2((_start.X, _start.Y));
-        var best = test((_destination.X, _destination.Y)).Count()-1;
+        var best = test((_destination.X, _destination.Y)).Count() - 1;
 
         AnsiConsole.MarkupLine($"Lowest number of moves is [green]{best}[/]");
 
@@ -69,14 +66,14 @@ internal class Solution : DayBase
         AnsiConsole.MarkupLine($"Trying to get to [yellow]{_destination.Y}[/],[yellow]{_destination.X}[/] from [yellow]{_start.Y}[/],[yellow]{_start.X}[/]");
 
         MakeGraph();
-        List<(int X, int Y)> aCells = new List<(int X, int Y)> ();
+        List<(int X, int Y)> aCells = new List<(int X, int Y)>();
         for (int x = 0; x < _cols; x++)
         {
             for (int y = 0; y < _rows; y++)
             {
                 if (_map[y, x] == 1)
                 {
-                    aCells.Add((x,y));
+                    aCells.Add((x, y));
                 }
             }
         }
@@ -87,7 +84,7 @@ internal class Solution : DayBase
         {
             var test = Move2((cell));
 
-            var distance = test(_destination).Count() -1;
+            var distance = test(_destination).Count() - 1;
             if (distance > 0)
             {
                 AnsiConsole.MarkupLine($"Distance from [yellow]{cell.Y}[/],[yellow]{cell.X}[/] to [yellow]{_destination.Y}[/],[yellow]{_destination.X}[/] is {distance}");
@@ -95,7 +92,7 @@ internal class Solution : DayBase
                     best = distance;
             }
         }
-        
+
 
         AnsiConsole.MarkupLine($"Lowest number of moves is [green]{best}[/]");
     }
@@ -113,13 +110,13 @@ internal class Solution : DayBase
             for (int y = 0; y < _rows; y++)
             {
                 var key = (x, y);
-                _mapGraph.Add(key, new ());
+                _mapGraph.Add(key, new());
 
                 if (x > 0 && _map[y, x - 1] - _map[y, x] <= 1)
                 {
-                    _mapGraph[key].Add((x-1, y));
+                    _mapGraph[key].Add((x - 1, y));
                 }
-                
+
                 if (x < _cols - 1 && _map[y, x + 1] - _map[y, x] <= 1)
                 {
                     _mapGraph[key].Add((x + 1, y));
@@ -129,7 +126,7 @@ internal class Solution : DayBase
                 {
                     _mapGraph[key].Add((x, y - 1));
                 }
-                
+
                 if (y < _rows - 1 && _map[y + 1, x] - _map[y, x] <= 1)
                 {
                     _mapGraph[key].Add((x, y + 1));
@@ -181,7 +178,7 @@ internal class Solution : DayBase
         return shortestPath;
 
     }
-    
+
     private void PrintTemp(char[,] temp)
     {
         for (int yRow = 0; yRow < _map.GetLength(0); yRow++)

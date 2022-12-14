@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Spectre.Console;
 
 namespace AdventOfCode2022.Day11
 ;

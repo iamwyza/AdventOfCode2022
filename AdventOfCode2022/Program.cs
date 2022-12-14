@@ -1,6 +1,4 @@
-﻿using Spectre.Console;
-
-DayBase.ScanForSolutions();
+﻿DayBase.ScanForSolutions();
 
 var choice = "";
 
@@ -12,7 +10,7 @@ while (choice != "0")
     var prompt = new SelectionPrompt<string>()
         .Title(
             "Enter Day and Part to run.  Example: Day 1 - Part 1 would be 1-1.  Day 3 - Part 2 would be 3-2.  Enter 0 for exit;?")
-        .PageSize(100)
+        .PageSize(4)
         .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]");
     if (!string.IsNullOrEmpty(last))
     {
