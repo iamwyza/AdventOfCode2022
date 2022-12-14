@@ -1,7 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
-
-namespace AdventOfCode2022.Day14
+﻿namespace AdventOfCode2022.Day14
 ;
 internal class Solution : DayBase
 {
