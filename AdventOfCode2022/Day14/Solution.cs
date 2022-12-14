@@ -39,7 +39,7 @@ internal class Solution : DayBase
                     continue;
                 }
 
-                AnsiConsole.MarkupLine($"Move From [yellow]{position.X}, {position.Y}[/] to [yellow]{targetX}, {targetY}[/]");
+                //AnsiConsole.MarkupLine($"Move From [yellow]{position.X}, {position.Y}[/] to [yellow]{targetX}, {targetY}[/]");
 
                 while (targetX != position.X || targetY != position.Y)
                 {
