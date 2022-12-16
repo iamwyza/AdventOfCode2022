@@ -1,5 +1,4 @@
-﻿namespace AdventOfCode2022.Day14
-;
+﻿namespace AdventOfCode2022.Day14;
 internal class Solution : DayBase
 {
     private sbyte[,] _map;
@@ -43,13 +42,16 @@ internal class Solution : DayBase
                     if (targetX > position.X)
                     {
                         position.X++;
-                    }else if (targetX < position.X)
+                    }
+                    else if (targetX < position.X)
                     {
                         position.X--;
-                    }else if (targetY > position.Y)
+                    }
+                    else if (targetY > position.Y)
                     {
                         position.Y++;
-                    }else if (targetY < position.Y)
+                    }
+                    else if (targetY < position.Y)
                     {
                         position.Y--;
                     }
@@ -57,7 +59,7 @@ internal class Solution : DayBase
                 }
             }
         }
-        
+
         //PrintCave();
     }
 
@@ -78,7 +80,7 @@ internal class Solution : DayBase
                 //PrintCave();
             }
 
-            if (sand.X < _bounds.minX || sand.Y > _bounds.maxY) 
+            if (sand.X < _bounds.minX || sand.Y > _bounds.maxY)
                 break;
         }
         PrintCave();
@@ -147,8 +149,8 @@ internal class Solution : DayBase
         }
         return true;
     }
-    
-    
+
+
 
 
     private void PrintCave()
@@ -159,7 +161,7 @@ internal class Solution : DayBase
             {
                 switch (_map[xCol, yRow])
                 {
-                    case -1: 
+                    case -1:
                         AnsiConsole.Markup("[red]#[/]");
                         break;
                     case 0:
