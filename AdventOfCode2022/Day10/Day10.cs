@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualBasic;
-
-namespace AdventOfCode2022.Day10
+﻿namespace AdventOfCode2022.Day10
 ;
-internal class Solution : DayBase
+internal class Day10 : DayBase
 {
     private List<int?> _instructions;
     private async Task Init()

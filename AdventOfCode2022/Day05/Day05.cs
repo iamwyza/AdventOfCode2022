@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AdventOfCode2022.Day5;
-internal class Solution : DayBase
+namespace AdventOfCode2022.Day05;
+internal class Day05 : DayBase
 {
     private readonly Regex _moveRegex = new Regex(@"move (\d+) from (\d+) to (\d+)", RegexOptions.Compiled);
 

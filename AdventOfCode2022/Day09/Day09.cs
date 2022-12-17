@@ -1,5 +1,5 @@
-﻿namespace AdventOfCode2022.Day9;
-internal class Solution : DayBase
+﻿namespace AdventOfCode2022.Day09;
+internal class Day09 : DayBase
 {
     enum Direction
     {

@@ -1,7 +1,5 @@
-﻿using System.Text.RegularExpressions;
-
-namespace AdventOfCode2022.Day6;
-internal class Solution : DayBase
+﻿namespace AdventOfCode2022.Day06;
+internal class Day06 : DayBase
 {
     private static int FindStart(string input, int length)
     {

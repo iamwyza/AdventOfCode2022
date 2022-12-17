@@ -1,5 +1,5 @@
 ﻿namespace AdventOfCode2022.Day14;
-internal class Solution : DayBase
+internal class Day14 : DayBase
 {
     private sbyte[,] _map;
 

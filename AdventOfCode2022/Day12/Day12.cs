@@ -1,5 +1,5 @@
 ﻿namespace AdventOfCode2022.Day12;
-internal class Solution : DayBase
+internal class Day12 : DayBase
 {
     private int[,] _map;
     private int _rows;

@@ -1,12 +1,7 @@
-﻿using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Reflection.Emit;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2022.Day15;
-internal class Solution : DayBase
+internal class Day15 : DayBase
 {
     private Grid<sbyte> _map;
 

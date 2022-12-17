@@ -1,5 +1,5 @@
-﻿namespace AdventOfCode2022.Day2;
-internal class Solution : DayBase
+﻿namespace AdventOfCode2022.Day02;
+internal class Day02 : DayBase
 {
     private enum Hand
     {

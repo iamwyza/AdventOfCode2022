@@ -1,22 +1,13 @@
-﻿namespace AdventOfCode2022;
+﻿using System.Diagnostics;
+
+namespace AdventOfCode2022;
 internal struct Coord
 {
-    //private int _x;
-    //private int _y;
-    //public int XOffset { get; set; }
-    //public int YOffset { get; set; }
 
     public int X;
-    //{
-    //    get => _x + XOffset;
-    //    set => _x = value - XOffset;
-    //}
+
 
     public int Y;
-    //{
-    //    get => _y + YOffset;
-    //    set => _y = value - YOffset;
-    //}
 
     public Coord()
     {
@@ -36,20 +27,68 @@ internal struct Coord
 
 }
 
-internal class Grid<T> where T : notnull
+internal class Grid<T> where T : struct, IComparable, IComparable<T>
 {
 
     public T this[Coord index]
     {
-        get => Map[index.X + XOffset, index.Y + YOffset];
-        set => Map[index.X + XOffset, index.Y + YOffset] = value;
+        get => Map[GetXIndex(index.Y), GetYIndex(index.Y)];
+        set => Map[GetXIndex(index.Y), GetYIndex(index.Y)] = value;
     }
 
     public T this[int x, int y]
     {
-        get => Map[x + XOffset, y + YOffset];
-        set => Map[x + XOffset, y + YOffset] = value;
+        get => Map[GetXIndex(x), GetYIndex(y)];
+        set => Map[GetXIndex(x), GetYIndex(y)] = value;
     }
+
+    private int _xLength;
+    private int _yLength;
+
+    private int GetXIndex(int x)
+    {
+        if (!CanWrapX) return x + XOffset;
+
+        if (x + XOffset < 0)
+        {
+            return _xLength + x + XOffset;
+        }
+
+        if (x + XOffset > _xLength)
+        {
+            return _xLength + x + XOffset;
+        }
+
+        return x + XOffset;
+    }
+
+    private int GetYIndex(int y)
+    {
+        //if (!CanWrapY) return y + YOffset;
+
+        if (y + YOffset < 0)
+        {
+            //if (y == -16188) Debugger.Break();
+            if (y % _yLength != 0) 
+                return (_yLength + (y % _yLength) + YOffset) ;
+
+            return YOffset; // Y = 0 + offset
+        }
+
+        if (y + YOffset >= _yLength)
+        {
+            if (y % _yLength != 0)
+                return y % _yLength + YOffset;
+
+            return YOffset;
+        }
+
+        return y + YOffset;
+    }
+
+
+    public bool CanWrapY = false;
+    public bool CanWrapX = false;
 
     public T[,] Map { get; internal set; }
 
@@ -67,7 +106,9 @@ internal class Grid<T> where T : notnull
 
     public void InitMap()
     {
-        Map = new T[Bounds.maxX+1, Bounds.maxY+1];
+        Map = new T[Bounds.maxX + 1, Bounds.maxY + 1];
+        _xLength = Map.GetLength(0);
+        _yLength = Map.GetLength(1);
     }
 
     public void ResetMap(T value)
@@ -100,9 +141,9 @@ internal class Grid<T> where T : notnull
 
     public bool InBounds(Coord coord)
     {
-        return coord.Y + YOffset >= 0 
-               && coord.X + XOffset >= 0 
-               && coord.Y + YOffset <= Bounds.maxY 
+        return coord.Y + YOffset >= 0
+               && coord.X + XOffset >= 0
+               && coord.Y + YOffset <= Bounds.maxY
                && coord.X + XOffset <= Bounds.maxX;
     }
 
@@ -119,21 +160,43 @@ internal class Grid<T> where T : notnull
     }
 
 
-    public void PrintMap(Func<T, (char letter, Color color)>? config)
+    public void PrintMap(Func<T, (char letter, Color color)>? config = null, bool printRowLabel = false, bool printEmptyRow = true, int yMin = 0, int yMax = 0)
     {
         config ??= DefaultPrintConfig;
-                
+
         for (int yRow = Bounds.minY; yRow <= Bounds.maxY; yRow++)
         {
-            AnsiConsole.Markup($"{yRow:0000;-000}");
-            for (int xCol = Bounds.minX; xCol <= Bounds.maxX; xCol++)
-            {
-                var setting = config(Map[xCol, yRow]);
 
-                AnsiConsole.Markup($"[{setting.color.ToMarkup()}]{setting.letter}[/]");
+
+            bool hasData = false;
+
+            if (!printEmptyRow)
+            {
+                for (int xCol = Bounds.minX; xCol <= Bounds.maxX; xCol++)
+                {
+                    if (!Map[xCol, yRow].Equals(default(T)))
+                    {
+                        hasData = true;
+                        break;
+                    }
+                }
             }
-            Console.WriteLine();
+
+            if (printEmptyRow || hasData && ((yMin == 0 && yMax == 0) || yRow >= yMin && yRow <= yMax))
+            {
+                if (printRowLabel)
+                    AnsiConsole.Markup($"{yRow:0000;-000}");
+
+                for (int xCol = Bounds.minX; xCol <= Bounds.maxX; xCol++)
+                {
+                    var setting = config(Map[xCol, yRow]);
+
+                    AnsiConsole.Markup($"[{setting.color.ToMarkup()}]{setting.letter}[/]");
+                }
+                Console.WriteLine();
+            }
         }
+
         Console.WriteLine();
     }
 }

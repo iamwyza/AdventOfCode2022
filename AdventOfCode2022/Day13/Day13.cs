@@ -2,7 +2,7 @@
 
 namespace AdventOfCode2022.Day13
 ;
-internal class Solution : DayBase
+internal class Day13 : DayBase
 {
     private class PacketList
     {

@@ -1,7 +1,5 @@
-﻿using System.Reflection.Metadata;
-
-namespace AdventOfCode2022.Day8;
-internal class Solution : DayBase
+﻿namespace AdventOfCode2022.Day08;
+internal class Day08 : DayBase
 {
     private int[,] _trees;
     private int[,] _scores;

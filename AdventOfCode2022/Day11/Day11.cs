@@ -2,7 +2,7 @@
 
 namespace AdventOfCode2022.Day11
 ;
-internal class Solution : DayBase
+internal class Day11 : DayBase
 {
     private Monkey[] _monkeys = null!;
     private delegate long OperationDelegate(long old);

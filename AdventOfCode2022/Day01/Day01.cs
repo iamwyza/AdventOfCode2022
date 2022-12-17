@@ -1,6 +1,6 @@
-﻿namespace AdventOfCode2022.Day1;
+﻿namespace AdventOfCode2022.Day01;
 
-internal class Solution : DayBase
+internal class Day01 : DayBase
 {
     public override async Task RunPart1()
     {

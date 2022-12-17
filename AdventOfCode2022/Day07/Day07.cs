@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AdventOfCode2022.Day7;
-internal class Solution : DayBase
+namespace AdventOfCode2022.Day07;
+internal class Day07 : DayBase
 {
     private readonly Dir _root = new() { Name = "/" };
 
