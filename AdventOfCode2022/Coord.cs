@@ -32,8 +32,8 @@ internal class Grid<T> where T : struct, IComparable, IComparable<T>
 
     public T this[Coord index]
     {
-        get => Map[GetXIndex(index.Y), GetYIndex(index.Y)];
-        set => Map[GetXIndex(index.Y), GetYIndex(index.Y)] = value;
+        get => Map[GetXIndex(index.X), GetYIndex(index.Y)];
+        set => Map[GetXIndex(index.X), GetYIndex(index.Y)] = value;
     }
 
     public T this[int x, int y]
