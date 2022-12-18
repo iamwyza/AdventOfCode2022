@@ -42,6 +42,18 @@ internal class Grid<T> where T : struct, IComparable, IComparable<T>
         set => Map[GetXIndex(x), GetYIndex(y)] = value;
     }
 
+    //public T this[Coord index]
+    //{
+    //    get => Map[index.X + XOffset, index.Y + YOffset];
+    //    set => Map[index.X + XOffset, index.Y + YOffset] = value;
+    //}
+
+    //public T this[int x, int y]
+    //{
+    //    get => Map[x + XOffset, y + YOffset];
+    //    set => Map[x + XOffset, y + YOffset] = value;
+    //}
+
     private int _xLength;
     private int _yLength;
 
@@ -182,7 +194,7 @@ internal class Grid<T> where T : struct, IComparable, IComparable<T>
                 }
             }
 
-            if (printEmptyRow || hasData && ((yMin == 0 && yMax == 0) || yRow >= yMin && yRow <= yMax))
+            if (printEmptyRow || hasData && ((yMin == 0 && yMax == 0) || (yRow >= yMin && yRow <= yMax)))
             {
                 if (printRowLabel)
                     AnsiConsole.Markup($"{yRow:0000;-000}");

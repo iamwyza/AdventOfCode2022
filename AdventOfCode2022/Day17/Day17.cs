@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.Toolkit.HighPerformance;
 
 namespace AdventOfCode2022.Day17;
 internal class Day17 : DayBase
@@ -46,7 +48,7 @@ internal class Day17 : DayBase
     {
         _map = new Grid<sbyte>();
         _map.CheckBounds(new Coord(0, 0));
-        _map.CheckBounds(new Coord(8, (2022 * 4) + 5)); // Max height of the cave is max piece height * 2022 (number of pieces that will fall)
+        _map.CheckBounds(new Coord(8, 1112)); // Max height of the cave is max piece height * 2022 (number of pieces that will fall)
 
         var lines = await GetLines();
 
@@ -75,7 +77,7 @@ internal class Day17 : DayBase
         _map.CanWrapY = true;
         _map.InitMap();
 
-        for (int y = _map.Bounds.maxY; y > 0; y--)
+        for (int y = _map.Bounds.maxY; y >= 0; y--)
         {
             if (y == _map.Bounds.maxY)
             {
@@ -84,8 +86,9 @@ internal class Day17 : DayBase
                     _map[x, y] = 3;
                 }
 
-                _map[0, y] = 4;
-                _map[_map.Bounds.maxX, y] = 4;
+                _map[0, y] = 2;
+                _map[_map.Bounds.maxX, y] = 2;
+
             }
             else
             {
@@ -114,156 +117,180 @@ internal class Day17 : DayBase
         PrintStart(1);
         await Init();
 
-        int movementIndex = 0;
-        int pieceIndex = 0;
-        int highestRock = _map.Bounds.maxY;
-        char[] movesChars = _moves.Select(x => x ? '<' : '>').ToArray();
+        //int movementIndex = 0;
+        //int pieceIndex = 0;
+        //int highestRock = _map.Bounds.maxY;
+        //char[] movesChars = _moves.Select(x => x ? '<' : '>').ToArray();
 
-        for (int i = 0; i < 2022; i++)
-        {
-            var piece = _pieces[pieceIndex++];
-            if (pieceIndex > _pieces.Length - 1)
-                pieceIndex = 0;
+        //for (int i = 0; i < 2022; i++)
+        //{
+        //    var piece = _pieces[pieceIndex++];
+        //    if (pieceIndex > _pieces.Length - 1)
+        //        pieceIndex = 0;
 
-            var bottomLeftCord = new Coord(3, highestRock - 4);
+        //    var bottomLeftCord = new Coord(3, highestRock - 4);
 
-            //AnsiConsole.MarkupLine($"Highest rock is now [yellow]{highestRock}[/]");
+        //    //AnsiConsole.MarkupLine($"Highest rock is now [yellow]{highestRock}[/]");
 
-            while (true)
-            {
-                sbyte offset = (sbyte)(_moves[movementIndex++] ? -1 : 1);
-                if (movementIndex > _moves.Length - 1)
-                    movementIndex = 0;
+        //    while (true)
+        //    {
+        //        sbyte offset = (sbyte)(_moves[movementIndex++] ? -1 : 1);
+        //        if (movementIndex > _moves.Length - 1)
+        //            movementIndex = 0;
 
-                //AnsiConsole.Markup($"Try to move [yellow]{(offset == 1 ? 'R' : 'L' )}[/] : ");
+        //        //AnsiConsole.Markup($"Try to move [yellow]{(offset == 1 ? 'R' : 'L' )}[/] : ");
 
-                //Debugging to show first state (doesn't actually try to move the piece)
-                CanMove(bottomLeftCord, 0, 0, piece);
-                Printmap(i);
-                ResetTemp(bottomLeftCord, 0, 0, piece);
-
-
-                if (CanMove(bottomLeftCord, offset, 0, piece))
-                {
-                    //AnsiConsole.MarkupLine("[green]Success[/]");
-                    Printmap(i);
-                    ResetTemp(bottomLeftCord, offset, 0, piece);
-                    bottomLeftCord.X += offset;
-                }
-                else
-                {
-                    //AnsiConsole.MarkupLine("[red]Failure[/]");
-                    Printmap(i);
-                    ResetTemp(bottomLeftCord, offset, 0, piece);
-                }
+        //        //Debugging to show first state (doesn't actually try to move the piece)
+        //        CanMove(bottomLeftCord, 0, 0, piece);
+        //        Printmap(i);
+        //        ResetTemp(bottomLeftCord, 0, 0, piece);
 
 
+        //        if (CanMove(bottomLeftCord, offset, 0, piece))
+        //        {
+        //            //AnsiConsole.MarkupLine("[green]Success[/]");
+        //            Printmap(i);
+        //            ResetTemp(bottomLeftCord, offset, 0, piece);
+        //            bottomLeftCord.X += offset;
+        //        }
+        //        else
+        //        {
+        //            //AnsiConsole.MarkupLine("[red]Failure[/]");
+        //            Printmap(i);
+        //            ResetTemp(bottomLeftCord, offset, 0, piece);
+        //        }
 
-                //AnsiConsole.Markup($"Try to move [yellow]Down[/] : ");
 
-                if (CanMove(bottomLeftCord, 0, 1, piece))
-                {
-                    //AnsiConsole.MarkupLine("[green]Success[/]");
-                    Printmap(i);
-                    ResetTemp(bottomLeftCord, 0, 1, piece);
-                    bottomLeftCord.Y += 1;
-                }
-                else
-                {
-                    //AnsiConsole.MarkupLine("[red]Failure[/]");
-                    Printmap(i);
-                    ResetTemp(bottomLeftCord, 0, 1, piece);
-                    SetPiece(bottomLeftCord, piece, ref highestRock);
-                    Printmap(i);
-                    break;
-                }
 
-            }
-        }
+        //        //AnsiConsole.Markup($"Try to move [yellow]Down[/] : ");
 
-        _map.PrintMap(null, true, false);
+        //        if (CanMove(bottomLeftCord, 0, 1, piece))
+        //        {
+        //            //AnsiConsole.MarkupLine("[green]Success[/]");
+        //            Printmap(i);
+        //            ResetTemp(bottomLeftCord, 0, 1, piece);
+        //            bottomLeftCord.Y += 1;
+        //        }
+        //        else
+        //        {
+        //            //AnsiConsole.MarkupLine("[red]Failure[/]");
+        //            Printmap(i);
+        //            ResetTemp(bottomLeftCord, 0, 1, piece);
+        //            SetPiece(bottomLeftCord, piece, ref highestRock);
+        //            Printmap(i);
+        //            break;
+        //        }
 
-        AnsiConsole.MarkupLine($"The height of the rocks is [green]{_map.Bounds.maxY - highestRock}[/]");
+        //    }
+        //}
 
-        void Printmap(int row)
-        {
-            return;
-            AnsiConsole.Clear();
-            Console.WriteLine();
-            Console.WriteLine();
-            AnsiConsole.MarkupLine($"Rock # [green]{row}[/]");
-           // AnsiConsole.MarkupLine($"[grey]{string.Join("",movesChars[(movementIndex-20 < 0 ? 0 : movementIndex - 20)..movementIndex])}[/][green]{movesChars[movementIndex]}[/][grey]{string.Join("", movesChars[movementIndex..( movementIndex + 20 > movesChars.Length ? movesChars.Length :  movementIndex +20)])}[/]");
-            Console.WriteLine();
-            _map.PrintMap(null, true, false, highestRock - 5, highestRock + 20);
-            Thread.Sleep(50);
-        }
+        //_map.PrintMap(null, true, false);
+
+        //AnsiConsole.MarkupLine($"The height of the rocks is [green]{_map.Bounds.maxY - highestRock}[/]");
+
+        //void Printmap(int row)
+        //{
+        //    return;
+        //    AnsiConsole.Clear();
+        //    Console.WriteLine();
+        //    Console.WriteLine();
+        //    AnsiConsole.MarkupLine($"Rock # [green]{row}[/]");
+        //   // AnsiConsole.MarkupLine($"[grey]{string.Join("",movesChars[(movementIndex-20 < 0 ? 0 : movementIndex - 20)..movementIndex])}[/][green]{movesChars[movementIndex]}[/][grey]{string.Join("", movesChars[movementIndex..( movementIndex + 20 > movesChars.Length ? movesChars.Length :  movementIndex +20)])}[/]");
+        //    Console.WriteLine();
+        //    _map.PrintMap(null, true, false, highestRock - 5, highestRock + 20);
+        //    Thread.Sleep(50);
+        //}
     }
 
-    private bool SetPiece(Coord bottomLeftCord, sbyte[,] piece, ref int highestRock)
+    private int GetY(int maxY, int currentY)
+    {
+        int ret;
+        if (currentY < 0) // -1001
+        {
+            ret = (currentY % maxY) + maxY;
+        }else if (currentY > maxY-1)
+        {
+            ret = (currentY % maxY);
+        }
+        else
+        {
+            ret = currentY;
+        }
+        //AnsiConsole.MarkupLine($"Current Y = [yellow]{currentY}[/]: Return [yellow]{ret}[/]");
+
+        return ret;
+    }
+
+    private bool SetPiece(Span2D<sbyte> map, Coord bottomLeftCord, sbyte[,] piece, ref int highestRock)
     {
         for (int x = 0; x < piece.GetLength(0); x++)
         {
             for (int y = 0; y < piece.GetLength(1); y++)
             {
                 int actualY = bottomLeftCord.Y + (y - piece.GetLength(1) + 1);
+                actualY = GetY(map.Width, actualY);
 
                 if (piece[x, y] > 0)
                 {
-                    _map[bottomLeftCord.X + x, actualY] = piece[x, y];
+                    map[bottomLeftCord.X + x, actualY] = piece[x, y];
                 }
                 if (bottomLeftCord.Y - y < highestRock)
                     highestRock = bottomLeftCord.Y - y;
+
+                //_map.PrintMap(null, true, false, actualY - 20, actualY + 20);
             }
         }
 
         return true;
     }
 
-    private bool CanMove(Coord bottomLeftCord, sbyte xOffset, byte yOffset, sbyte[,] piece)
+    private bool CanMove(Span2D<sbyte> map, Coord bottomLeftCord, sbyte xOffset, byte yOffset, sbyte[,] piece)
     {
-        bool canMove = true;
+        //bool canMove = true;
         for (int x = 0; x < piece.GetLength(0); x++)
         {
             for (int y = 0; y < piece.GetLength(1); y++)
             {
                 int actualY = bottomLeftCord.Y + yOffset + (y - piece.GetLength(1) + 1);
-                var value = _map[bottomLeftCord.X + x + xOffset, actualY] + piece[x, y];
+                actualY = GetY(map.Width, actualY);
+
+                var value = map[bottomLeftCord.X + x + xOffset, actualY] + piece[x, y];
                 if (value == 5)
                     value = 0;
 
                 if (value > 1)
                 {
-                    canMove = false;
+                    return false;
                 }
 
                 // for visualizing the movements, not really needed to calculate them.
-                //_map[bottomLeftCord.X + x + xOffset, actualY] = (sbyte)(piece[x, y] == 1 ? _map[bottomLeftCord.X + x + xOffset, actualY] + 5 : _map[bottomLeftCord.X + x + xOffset, actualY]);
+                _map[bottomLeftCord.X + x + xOffset, actualY] = (sbyte)(piece[x, y] == 1 ? _map[bottomLeftCord.X + x + xOffset, actualY] + 5 : _map[bottomLeftCord.X + x + xOffset, actualY]);
             }
         }
 
-        return canMove;
+        return true;
     }
 
-    private void ResetTemp(Coord bottomLeftCord, sbyte xOffset, byte yOffset, sbyte[,] piece)
+    private void ResetTemp(Span2D<sbyte> map, Coord bottomLeftCord, sbyte xOffset, byte yOffset, sbyte[,] piece)
     {
         for (int x = 0; x < piece.GetLength(0); x++)
         {
             for (int y = 0; y < piece.GetLength(1); y++)
             {
                 int actualY = bottomLeftCord.Y + yOffset + (y - piece.GetLength(1) + 1);
-
-                if (_map[bottomLeftCord.X + x + xOffset, actualY] >= 5)
+                actualY = GetY(map.Width, actualY);
+                if (map[bottomLeftCord.X + x + xOffset, actualY] >= 5)
                 {
-                    _map[bottomLeftCord.X + x + xOffset, actualY] -= 5;
+                    map[bottomLeftCord.X + x + xOffset, actualY] -= 5;
                 }
             }
         }
     }
 
-    public override async Task RunPart2()
+    public override Task RunPart2()
     {
         PrintStart(2);
-        await Init();
+        Init().GetAwaiter().GetResult();
 
         int movementIndex = 0;
         int pieceIndex = 0;
@@ -271,42 +298,65 @@ internal class Day17 : DayBase
         char[] movesChars = _moves.Select(x => x ? '<' : '>').ToArray();
         int loop = 0;
 
-        for (int i = 0; i < 1_000_000_000; i++)
+        var map = new Span2D<sbyte>(_map.Map);
+
+        for (int i = 0; i < 2022; i++)
         {
+            //if (i == 700) 
+            //    Debugger.Break();
+
             var piece = _pieces[pieceIndex++];
             if (pieceIndex > _pieces.Length - 1)
                 pieceIndex = 0;
 
             // If we've looped around a few times, we should reset the highestRock down (to keep the numbers more managable. 
-            if (highestRock < -_map.Bounds.maxY - 10)
+            if (highestRock < 0)
             {
                 loop++;
+                Printmap(i);
                 highestRock = (highestRock % _map.Bounds.maxY) + _map.Bounds.maxY;
-                
-                
+                Printmap(i);
+
             }
 
-            if (i % 200 == 0 && loop > 0)
-            {
-                // clear the rows ahead since we might have looped.
-                for (int zy = highestRock; zy > highestRock - 1000; zy--)
-                {
-                    for (int x = 1; x < _map.Bounds.maxX; x++)
-                    {
-                        _map[x, zy] = 0;
-                    }
-                }
-                //AnsiConsole.Clear();
-                //_map.PrintMap();
-            }
-           
+            //if (i % 1000 == 0 && loop > 0)
+            //{
+            //    // clear the rows ahead since we might have looped.
+            //    for (int zy = highestRock; zy > highestRock - 1000; zy--)
+            //    {
+            //        for (int x = 1; x < _map.Bounds.maxX; x++)
+            //        {
+            //            map[x, zy] = 0;
+            //        }
+            //    }
+            //    //AnsiConsole.Clear();
+            //    //_map.PrintMap();
+            //}
+
 
             var bottomLeftCord = new Coord(3, highestRock - 4);
 
-            if (highestRock < -10000)
+            for (int x = 1; x < map.Height-1; x++)
             {
-                Debugger.Break();
+                for (int y = bottomLeftCord.Y-5; y <= bottomLeftCord.Y; y++)
+                {
+                    int actualY = GetY(map.Width, y);
+
+                    map[x, actualY] = 0;
+                }
             }
+
+            //for (int y = bottomLeftCord.Y; y <= bottomLeftCord.Y + 4; y++)
+            //{
+            //    int actualY = GetY(map.Width, y);
+
+            //    if (map[0, actualY] == 1 || map[8,actualY] == 1)
+            //        Debugger.Break();
+                    
+            //}
+
+            
+
             //AnsiConsole.MarkupLine($"Highest rock is now [yellow]{highestRock}[/]");
 
             if (i % 1_000_000 == 0)
@@ -323,43 +373,43 @@ internal class Day17 : DayBase
                 //AnsiConsole.Markup($"Try to move [yellow]{(offset == 1 ? 'R' : 'L' )}[/] : ");
 
                 //Debugging to show first state (doesn't actually try to move the piece)
-                CanMove(bottomLeftCord, 0, 0, piece);
-                //Printmap(i);
-                //ResetTemp(bottomLeftCord, 0, 0, piece);
+                CanMove(map, bottomLeftCord, 0, 0, piece);
+                Printmap(i);
+                ResetTemp(map, bottomLeftCord, 0, 0, piece);
 
 
-                if (CanMove(bottomLeftCord, offset, 0, piece))
+                if (CanMove(map, bottomLeftCord, offset, 0, piece))
                 {
                     //AnsiConsole.MarkupLine("[green]Success[/]");
-                    //Printmap(i);
-                    //ResetTemp(bottomLeftCord, offset, 0, piece);
+                    Printmap(i);
+                    ResetTemp(map,bottomLeftCord, offset, 0, piece);
                     bottomLeftCord.X += offset;
                 }
                 else
                 {
                     //AnsiConsole.MarkupLine("[red]Failure[/]");
-                    //Printmap(i);
-                    //ResetTemp(bottomLeftCord, offset, 0, piece);
+                    Printmap(i);
+                    ResetTemp(map, bottomLeftCord, offset, 0, piece);
                 }
 
 
 
                 //AnsiConsole.Markup($"Try to move [yellow]Down[/] : ");
 
-                if (CanMove(bottomLeftCord, 0, 1, piece))
+                if (CanMove(map, bottomLeftCord, 0, 1, piece))
                 {
                     //AnsiConsole.MarkupLine("[green]Success[/]");
-                    //Printmap(i);
-                    //ResetTemp(bottomLeftCord, 0, 1, piece);
+                    Printmap(i);
+                    ResetTemp(map, bottomLeftCord, 0, 1, piece);
                     bottomLeftCord.Y += 1;
                 }
                 else
                 {
                     //AnsiConsole.MarkupLine("[red]Failure[/]");
-                    //Printmap(i);
-                    //ResetTemp(bottomLeftCord, 0, 1, piece);
-                    SetPiece(bottomLeftCord, piece, ref highestRock);
-                    //Printmap(i);
+                    Printmap(i);
+                    ResetTemp(map, bottomLeftCord, 0, 1, piece);
+                    SetPiece(map, bottomLeftCord, piece, ref highestRock);
+                    Printmap(i);
                     break;
                 }
 
@@ -367,21 +417,23 @@ internal class Day17 : DayBase
         }
 
         _map.PrintMap(null, true, false);
+        AnsiConsole.MarkupLine($"Loop: [green]{loop}[/] = [green]{(_map.Bounds.maxY + 1) * loop}[/] Highest: [green]{highestRock}[/] Calc: [green]{((_map.Bounds.maxY + 1) * (loop)) + (_map.Bounds.maxY - highestRock + 2)}[/]");
 
-        AnsiConsole.MarkupLine($"The height of the rocks is [green]{_map.Bounds.maxY - highestRock}[/]");
+        AnsiConsole.MarkupLine($"The height of the rocks is [green]{ ((_map.Bounds.maxY+1) * (loop)) + (_map.Bounds.maxY - highestRock + 2)}[/]");
+
+        return Task.CompletedTask;
 
         void Printmap(int row)
         {
             return;
-            if (row < 5100) return;
             AnsiConsole.Clear();
             Console.WriteLine();
             Console.WriteLine();
-            AnsiConsole.MarkupLine($"Rock # [green]{row}[/]");
+            AnsiConsole.MarkupLine($"Rock # [green]{row}[/].  Loop: [green]{loop}[/] Highest: [green]{highestRock}[/] Calc: [green]{((_map.Bounds.maxY+1) * (loop)) + (_map.Bounds.maxY - highestRock)}[/]");
             // AnsiConsole.MarkupLine($"[grey]{string.Join("",movesChars[(movementIndex-20 < 0 ? 0 : movementIndex - 20)..movementIndex])}[/][green]{movesChars[movementIndex]}[/][grey]{string.Join("", movesChars[movementIndex..( movementIndex + 20 > movesChars.Length ? movesChars.Length :  movementIndex +20)])}[/]");
             Console.WriteLine();
-            _map.PrintMap(null, true, false, highestRock - 5, highestRock + 20);
-            //Thread.Sleep(50);
+            _map.PrintMap(null, true, false);
+           Thread.Sleep(10);
         }
     }
 
