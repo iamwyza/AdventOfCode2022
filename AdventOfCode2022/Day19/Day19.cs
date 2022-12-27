@@ -9,6 +9,8 @@ namespace AdventOfCode2022.Day19;
 internal class Day19 : DayBase
 {
 
+    private static short _totalMinutes = 24;
+
     private class Blueprint
     {
         public int OreRobotCost;
@@ -17,6 +19,21 @@ internal class Day19 : DayBase
         public int ObsidianRobotClayCost;
         public int GeodeRobotOreCost;
         public int GeodeRobotObsidianCost;
+
+        private int _maxOreCost = 0;
+        public int MaxOreCost
+        {
+            get
+            {
+                if (_maxOreCost > 0)
+                {
+                    return _maxOreCost;
+                }
+
+                _maxOreCost = new [] { OreRobotCost, ClayRobotCost, ObsidianRobotOreCost, GeodeRobotOreCost }.Max();
+                return _maxOreCost;
+            }
+        }
 
         public int MaxGeodeCount = 0;
     }
@@ -32,7 +49,11 @@ internal class Day19 : DayBase
 
         public abstract bool CanMake(State state);
 
+        public abstract bool CanMakeFuture(State state, out short minutes);
+
         public abstract void Make(State state);
+
+        public abstract bool MaxRobotsMade(State state);
     }
 
     private class OreRobot : Robot
@@ -43,13 +64,45 @@ internal class Day19 : DayBase
 
         public override bool CanMake(State state)
         {
+
+            if (MaxRobotsMade(state)) return false;
+
             return Blueprint.OreRobotCost <= state.Ore;
+        }
+
+        public override bool CanMakeFuture(State state, out short minutes)
+        {
+            minutes = 1;
+
+            if (MaxRobotsMade(state)) return false;
+
+            
+
+            for (var i = state.Minute; i <= _totalMinutes; i++)
+            {
+                minutes++;
+                if (Blueprint.OreRobotCost <= state.Ore + (state.OreRobot * minutes) + (state.LastAction == Action.Ore ? -1 : 0))
+                {
+                    return true;
+                }
+            }
+
+            minutes = -1;
+
+            return false;
         }
 
         public override void Make(State state)
         {
             state.OreRobot++;
             state.Ore -= Blueprint.OreRobotCost;
+            state.LastAction = Action.Ore;
+        }
+
+        public override bool MaxRobotsMade(State state)
+        {
+            // No purpose in building more robots than we could consume in 1 minute
+            return state.OreRobot >= Blueprint.MaxOreCost;
         }
     }
 
@@ -61,13 +114,42 @@ internal class Day19 : DayBase
 
         public override bool CanMake(State state)
         {
+            if (MaxRobotsMade(state)) return false;
+
             return Blueprint.ClayRobotCost <= state.Ore;
+        }
+
+        public override bool CanMakeFuture(State state, out short minutes)
+        {
+            minutes = 1;
+
+            if (MaxRobotsMade(state)) return false;
+
+            for (var i = state.Minute; i <= _totalMinutes; i++)
+            {
+                minutes++;
+                if (Blueprint.ClayRobotCost <= state.Ore + state.OreRobot * minutes + (state.LastAction == Action.Ore ? -1 : 0))
+                {
+                    return true;
+                }
+            }
+
+            minutes = -1;
+
+            return false;
         }
 
         public override void Make(State state)
         {
             state.ClayRobot++;
             state.Ore -= Blueprint.ClayRobotCost;
+            state.LastAction = Action.Clay;
+        }
+
+        public override bool MaxRobotsMade(State state)
+        {
+            // No purpose in building more robots than we could consume in 1 minute
+            return state.ClayRobot >= Blueprint.ObsidianRobotClayCost;
         }
     }
 
@@ -79,7 +161,30 @@ internal class Day19 : DayBase
 
         public override bool CanMake(State state)
         {
+            if (MaxRobotsMade(state)) return false;
+
             return Blueprint.ObsidianRobotOreCost <= state.Ore && Blueprint.ObsidianRobotClayCost <= state.Clay;
+        }
+
+        public override bool CanMakeFuture(State state, out short minutes)
+        {
+            minutes = 1;
+
+            if (state.ClayRobot == 0 | MaxRobotsMade(state)) return false;
+
+            for (var i = state.Minute; i <= _totalMinutes; i++)
+            {
+                minutes++;
+                if (Blueprint.ObsidianRobotOreCost <= state.Ore + state.OreRobot * minutes + (state.LastAction == Action.Ore ? -1 : 0)
+                    && Blueprint.ObsidianRobotClayCost <= state.Clay + state.ClayRobot * minutes + (state.LastAction == Action.Clay ? -1 : 0))
+                {
+                    return true;
+                }
+            }
+
+            minutes = -1;
+
+            return false;
         }
 
         public override void Make(State state)
@@ -87,6 +192,14 @@ internal class Day19 : DayBase
             state.ObsidianRobot++;
             state.Ore -= Blueprint.ObsidianRobotOreCost;
             state.Clay -= Blueprint.ObsidianRobotClayCost;
+            state.LastAction = Action.Obsidian;
+
+        }
+
+        public override bool MaxRobotsMade(State state)
+        {
+            // No purpose in building more robots than we could consume in 1 minute
+            return state.ObsidianRobot >= Blueprint.GeodeRobotObsidianCost;
         }
     }
     private class GeodeRobot : Robot
@@ -100,13 +213,43 @@ internal class Day19 : DayBase
             return Blueprint.GeodeRobotOreCost <= state.Ore && Blueprint.GeodeRobotObsidianCost <= state.Obsidian;
         }
 
+        public override bool CanMakeFuture(State state, out short minutes)
+        {
+            minutes = 1;
+
+            if (state.ObsidianRobot == 0) return false;
+
+            for (var i = state.Minute; i <= _totalMinutes; i++)
+            {
+                minutes++;
+                if (Blueprint.GeodeRobotOreCost <= state.Ore + state.OreRobot * minutes + (state.LastAction == Action.Ore ? -1 : 0)
+                    && Blueprint.GeodeRobotObsidianCost <= state.Obsidian + state.ObsidianRobot * minutes + (state.LastAction == Action.Obsidian ? -1 : 0))
+                {
+                    return true;
+                }
+            }
+
+            minutes = -1;
+
+            return false;
+        }
+
         public override void Make(State state)
         {
             state.GeodeRobot++;
             state.Ore -= Blueprint.GeodeRobotOreCost;
             state.Obsidian -= Blueprint.GeodeRobotObsidianCost;
+            state.LastAction = Action.Geode;
+
+        }
+
+        public override bool MaxRobotsMade(State state)
+        {
+            return false;
         }
     }
+    
+    // Does this actually save memory by using bit shifting to read/write a single value with property lookups? IDK, i think so, but it was more just fun to play with bitwise stuff since I rarely do it in my day-to-day.
     private class State
     {
         public long Ore
@@ -154,7 +297,16 @@ internal class Day19 : DayBase
 
         public long Minute
         {
-            get => GetValue(_state, 57, 6);
+            get
+            {
+                var value = GetValue(_state, 57, 6);
+                if ( value == -1)
+                {
+                    Debugger.Break();
+                }
+
+                return value;
+            }
             set => SetState(value, 57, 6);
         }
 
@@ -166,28 +318,62 @@ internal class Day19 : DayBase
 
         public State()
         {
-
+            History = new();
+            ActionsTaken = new List<(long day, Action action)>();
         }
+
+        public readonly List<State> History;
+        public List<(long day, Action action)> ActionsTaken;
 
         private const long Mask = 0b_1111111;
 
         public State(long fromCode)
         {
             _state = fromCode;
-;
-           // Console.WriteLine($"Ore Bits:    {Convert.ToString(mask & fromCode, toBase: 2).PadLeft(64, '0')}");
-            //Console.WriteLine($"Clay Bits:   {Convert.ToString((Mask << 7) & (fromCode << 7), toBase: 2).PadLeft(64, '0')}");
+            History = new();
+            ActionsTaken = new List<(long day, Action action)>();
 
-            //Ore = GetValue(fromCode, 0);
-            //Clay = GetValue(fromCode, 7);
-            //Obsidian = GetValue(fromCode, 14);
-            //Geode = GetValue(fromCode, 21);
-            //OreRobot = GetValue(fromCode, 28);
-            //ClayRobot = GetValue(fromCode, 35);
-            //ObsidianRobot = GetValue(fromCode, 42);
-            //GeodeRobot = GetValue(fromCode, 49);
-            //Minute = GetValue(fromCode, 57, 6);
         }
+
+        public void FastForward(short minutes)
+        {
+            for (int i = 0; i < minutes; i++)
+            {
+                History.Add(new State(this) { ActionsTaken  = new(ActionsTaken), LastAction = LastAction});
+                Ore += OreRobot;
+                Clay += ClayRobot;
+                Obsidian += ObsidianRobot;
+                Geode += GeodeRobot;
+                switch (LastAction)
+                {
+                    case Action.Ore:
+                        Ore--;
+                        break;
+                    case Action.Clay:
+                        Clay--;
+                        break;
+                    case Action.Obsidian:
+                        Obsidian--;
+                        break;
+                    case Action.Geode:
+                        Geode--;
+                        break;
+                }
+
+                
+
+                LastAction = Action.None;
+
+                Minute += 1;
+            }
+
+            
+
+            LastAction = Action.None;
+
+        }
+
+        public Action LastAction;
 
         private static long GetValue(long fromCode, int offset, int width = 7)
         {
@@ -202,9 +388,12 @@ internal class Day19 : DayBase
             return ((Mask << offset) & fromCode) >> offset;
         }
 
+        
         private void SetState(long value, int offset, int width=7)
         {
-            
+
+            // Masks off the state so that only the bits were changing are altered.  They are set to 0.  
+
             //PrintHighlightedBits("FromCode", _state, 0, 0);
 
             long mask = ((long.MaxValue) ^ (127L << offset));
@@ -213,10 +402,11 @@ internal class Day19 : DayBase
             //Console.WriteLine($"Mask :         {Convert.ToString(mask, toBase: 2).PadLeft(64, '0')}");
             //Console.WriteLine($"MaskedState:   {Convert.ToString((_state & mask) | (value << offset), toBase: 2).PadLeft(64, '0')}");
             
+            // Then set the state to the combination of the state before and the new value for those bits only. 
 
             _state = (_state & mask) | (value << offset);
             //PrintHighlightedBits("State", _state, 64 - offset - width, width);
-            Console.WriteLine();
+            //Console.WriteLine();
         }
 
         private static void PrintHighlightedBits(string text, long value, int start, int length)
@@ -290,7 +480,15 @@ internal class Day19 : DayBase
         {
             AnsiConsole.MarkupLine($"Blueprint [yellow]{blueprint.Key}[/]");
 
-            long best = Simulate(blueprint.Key);
+            var state = new State
+            {
+                OreRobot = 1,
+                Minute = 1
+            };
+            //state.History.Add(state);
+            //long best = Simulate(blueprint.Key);
+
+            long best = DepthFirstSearch(state, blueprint.Value, _totalMinutes);
             lock (locker)
             {
                 total += best * blueprint.Key;
@@ -303,11 +501,12 @@ internal class Day19 : DayBase
         AnsiConsole.MarkupLine($"Total score is [green]{total}[/]");
     }
 
-    private long Simulate(int blueprintId)
+    private long DepthFirstSearch(State initialState, Blueprint blueprint, int minutes)
     {
-        var blueprint = _blueprints[blueprintId];
-
+        var visited = new HashSet<long>();
+        State bestState = initialState;
         long best = 0;
+
 
         Dictionary<Action, Robot> robots = new Dictionary<Action, Robot>
         {
@@ -316,84 +515,6 @@ internal class Day19 : DayBase
             { Action.Obsidian, new ObsidianRobot(blueprint) },
             { Action.Geode, new GeodeRobot(blueprint) }
         };
-
-
-        foreach(var actionPermutation in ActionPermutations)
-        {
-            //AnsiConsole.Clear();
-
-            var state = new State
-            {
-                OreRobot = 1
-            };
-
-            Action? nextAction = null;
-            int actionIndex = 0;
-            List<(long day, Action action)> actionsTaken = new List<(long day, Action action)>();
-            for (state.Minute = 1; state.Minute <= 24; state.Minute++)
-            {
-
-                // Phase 1 - Action phase
-                var actionTaken = Action.None;
-                if (nextAction == null)
-                {
-                    if (actionIndex < actionPermutation.Length)
-                    {
-                        nextAction = actionPermutation[actionIndex++];
-                    }
-                    else
-                    {
-                        nextAction = Action.None;
-                    }
-                }
-
-                //nextAction = GetAction(state, robots, blueprint, ref shouldBreak);
-
-
-                if (nextAction != Action.None)
-                {
-                    if (robots[nextAction.Value].CanMake(state))
-                    {
-                        robots[nextAction.Value].Make(state);
-                        actionTaken = nextAction.Value;
-                        nextAction = null;
-                    }
-                }
-              
-
-                // Phase 2 - Accumulation phase - if we added a bot this round, it doesn't take effect till next round. so subtract one from the one we just added.
-                state.Ore += state.OreRobot - (int)(actionTaken == Action.Ore ? 1 : 0);
-                state.Clay += state.ClayRobot - (int)(actionTaken == Action.Clay ? 1 : 0);
-                state.Obsidian += state.ObsidianRobot - (int)(actionTaken == Action.Obsidian ? 1 : 0);
-                state.Geode += state.GeodeRobot - (int)(actionTaken == Action.Geode ? 1 : 0);
-
-                if (actionTaken != Action.None)
-                {
-                    actionsTaken.Add((state.Minute, actionTaken));
-                }
-                //Console.WriteLine($"Before: {Convert.ToString(state.StateCode, toBase: 2).PadLeft(64, '0')}");
-
-            }
-            PrintState(state, blueprint, actionsTaken);
-            PrintState(new State(state.StateCode), blueprint, actionsTaken);
-            if (state.Geode > best)
-            {
-                best = state.Geode;
-            }
-        }
-
-        return best;
-    }
-
-    private IEnumerable<Action[]> ActionPermutations { get; } = new List<Action[]>()
-    {
-        new [] { Action.Clay, Action.Clay, Action.Obsidian, Action.Obsidian, Action.Geode }
-    };
-
-    /*private long DepthFirstSearch(State initialState, Blueprint blueprint, int minutes)
-    {
-        var visited = new HashSet<long>();
-        long best = 0;
 
         var stack = new Stack<State>();
         stack.Push(initialState);
@@ -404,24 +525,78 @@ internal class Day19 : DayBase
 
             if (visited.Contains(vertex))
                 continue;
+            //PrintState(vertex, blueprint, null);
+            if (vertex.Geode > best)
+            {
+                best = vertex.Geode;
+                bestState = vertex;
+            }
 
-            long[] neighbors = new long[4];
-            
+            // theoretical best case scenario of this branch.  If it is already less than the best we could do in another branch, it's dead.
+            var remainingTime = _totalMinutes + 1 - vertex.Minute;
+            long possibleBest = vertex.Geode + remainingTime * vertex.GeodeRobot +
+                                (remainingTime * (remainingTime - 1)) / 2;
+
+            //if (possibleBest < best) 
+            //    continue;
+
+            List<State> neighbors = new List<State>();
+
+            foreach (var (action, robot) in robots)
+            {
+                if (robot.CanMakeFuture(vertex, out short minutesUntilCanMake))
+                {
+                    var neighbor = new State(vertex) { LastAction = vertex.LastAction};
+                    
+                    neighbor.History.AddRange(vertex.History);
+                    neighbor.ActionsTaken.AddRange(vertex.ActionsTaken);
+                    //neighbor.History.Add(neighbor);
+
+                    // If the next thing we can build happens after the last minute, then fast-forward until the last minute and get the state of the geodes, check for best and return;
+                    if (neighbor.Minute + minutesUntilCanMake > _totalMinutes)
+                    {
+                        neighbor.FastForward((short)(_totalMinutes - neighbor.Minute));
+
+                        
+                        if (neighbor.Geode > best)
+                        {
+                            best = neighbor.Geode;
+                            bestState = neighbor;
+                        }
+
+                        continue;
+                    }
+
+                    neighbor.FastForward(minutesUntilCanMake);
+                    robot.Make(neighbor);
+                    neighbor.ActionsTaken.Add((neighbor.Minute, action));
+                    neighbors.Add(neighbor);
+                }
+            }
+
 
             visited.Add(vertex);
 
-            foreach (var neighbor in vertex.GetVertices())
+            foreach (var neighbor in neighbors)
                 if (!visited.Contains(neighbor))
                     stack.Push(neighbor);
         }
 
+        foreach (var state in bestState.History)
+        {
+            PrintState(state, blueprint, state.ActionsTaken);
+        }
+
+        PrintState(bestState, blueprint, bestState.ActionsTaken);
+
+
         return best;
-    }*/
+    }
 
 
-    private void PrintState(State state, Blueprint blueprint, List<(long day, Action action)> actionsTaken)
+    private void PrintState(State state, Blueprint blueprint, List<(long day, Action action)>? actionsTaken)
     {
-        AnsiConsole.MarkupLine($"Minute [green]{state.Minute}[/]");
+        AnsiConsole.MarkupLine($"Minute [green]{state.Minute}[/]. Last Action: [green]{state.LastAction}[/]");
         var table = new Table();
         table.Border(TableBorder.Rounded);
 
@@ -435,20 +610,24 @@ internal class Day19 : DayBase
         robotTable.AddRow("[blue]Geode[/]", $"[white]{state.GeodeRobot}[/]");
 
         var inventoryTable = new Table() { Border = TableBorder.DoubleEdge, BorderStyle = new Style(Color.Red3) };
-        inventoryTable.AddColumn("Robot");
+        inventoryTable.AddColumn("Type");
         inventoryTable.AddColumn("Count");
-        inventoryTable.AddRow("[blue]Ore[/]", $"[white]{state.Ore}[/]");
-        inventoryTable.AddRow("[blue]Clay[/]", $"[white]{state.Clay}[/]");
-        inventoryTable.AddRow("[blue]Obsidian[/]", $"[white]{state.Obsidian}[/]");
-        inventoryTable.AddRow("[blue]Geode[/]", $"[white]{state.Geode}[/]");
+        inventoryTable.AddRow("[blue]Ore[/]", $"[white]{state.Ore}[/] + [green]{(state.LastAction == Action.Ore ? state.OreRobot -1 : state.OreRobot)}[/]");
+        inventoryTable.AddRow("[blue]Clay[/]", $"[white]{state.Clay}[/] + [green]{(state.LastAction == Action.Clay ? state.ClayRobot - 1 : state.ClayRobot)}[/]");
+        inventoryTable.AddRow("[blue]Obsidian[/]", $"[white]{state.Obsidian}[/] + [green]{(state.LastAction == Action.Obsidian ? state.ObsidianRobot - 1 : state.ObsidianRobot)}[/]");
+        inventoryTable.AddRow("[blue]Geode[/]", $"[white]{state.Geode}[/] + [green]{(state.LastAction == Action.Geode ? state.GeodeRobot - 1 : state.GeodeRobot)}[/]");
 
         var actionsTable = new Table() { Border = TableBorder.DoubleEdge, BorderStyle = new Style(Color.Purple) };
         actionsTable.AddColumn("Turn");
         actionsTable.AddColumn("Action");
-        foreach (var action in actionsTaken)
+        if (actionsTaken != null)
         {
-            actionsTable.AddRow($"[green]{action.day}[/]", $"Build a [green]{action.action}[/] robot.");
+            foreach (var action in actionsTaken)
+            {
+                actionsTable.AddRow($"[green]{action.day}[/]", $"Build a [green]{action.action}[/] robot.");
+            }
         }
+     
 
         var costsTable = new Table() { Border = TableBorder.DoubleEdge, BorderStyle = new Style(Color.SandyBrown) };
         costsTable.AddColumns("Robot", "Cost");
